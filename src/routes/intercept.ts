@@ -3,11 +3,7 @@ import { FastifyBaseLogger } from 'fastify';
 import Twilio from 'twilio';
 
 import TranslationService from '@/services/TranslationService';
-import StreamSocket, {
-  StartBaseAudioMessage,
-  PromptVoxrayMessage,
-  SetupVoxrayMessage,
-} from '@/services/StreamSocket';
+import StreamSocket, { SetupVoxrayMessage } from '@/services/StreamSocket';
 
 const interceptWS: FastifyPluginAsyncTypebox = async (server) => {
   server.get(
@@ -34,10 +30,9 @@ const interceptWS: FastifyPluginAsyncTypebox = async (server) => {
         logger,
         socket,
       });
-      const map =
-        req.diScope.resolve<Map<string, TranslationService>>(
-          'audioInterceptors',
-        );
+      const map = req.diScope.resolve<Map<string, TranslationService>>(
+        'translationInterceptors',
+      );
 
       ss.onSetup(async (message: SetupVoxrayMessage) => {
         logger.info('message %s', JSON.stringify(message));

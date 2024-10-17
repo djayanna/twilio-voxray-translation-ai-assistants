@@ -22,14 +22,14 @@ const flexReservationAccepted: FastifyPluginAsync = async (server) => {
       const logger = req.diScope.resolve<FastifyBaseLogger>('logger');
       const map =
         req.diScope.resolve<Map<string, TranslationService>>(
-          'audioInterceptors',
+          'translationInterceptors',
         );
       console.log("task attributes", JSON.parse(req.body?.TaskAttributes));
       const { from } = JSON.parse(req.body.TaskAttributes);
 
       const translationService = map.get(from);
       if (!translationService) {
-        logger.error('AudioInterceptor not found');
+        logger.error('translationService not found');
         res.status(404).send('Not Found');
         return;
       }

@@ -44,7 +44,7 @@ await server.register(ws);
 await server.register(routes);
 
 diContainer.register({
-  audioInterceptors: asValue(new Map<string, TranslationService>()),
+  translationInterceptors: asValue(new Map<string, TranslationService>()),
   logger: asValue(server.log.child({ stream: 'app' })),
 });
 

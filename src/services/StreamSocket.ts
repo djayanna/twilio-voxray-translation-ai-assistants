@@ -10,29 +10,6 @@ export type ConnectedBaseAudioMessage = BaseAudioMessage & {
   protocol: string;
 };
 
-// All types here https://www.twilio.com/docs/voice/media-streams/websocket-messages#send-websocket-messages-to-twilio
-export type StartBaseAudioMessage = BaseAudioMessage & {
-  event: 'start';
-  start: {
-    streamSid: string;
-    accountSid: string;
-    callSid: string;
-    track: 'inbound' | 'outbound';
-    customParameters: Record<string, unknown>;
-  };
-};
-
-export type MediaBaseAudioMessage = BaseAudioMessage & {
-  event: 'media';
-  media: {
-    chunk: number;
-    timestamp: string;
-    payload: string;
-    streamSid: string;
-    track: 'inbound' | 'outbound';
-  };
-};
-
 export type StopBaseAudioMessage = BaseAudioMessage & {
   event: 'stop';
   stop: {
@@ -40,14 +17,6 @@ export type StopBaseAudioMessage = BaseAudioMessage & {
     callSid: string;
   };
   from?: string;
-};
-
-export type MarkBaseAudioMessage = BaseAudioMessage & {
-  event: 'mark';
-  stop: {
-    accountSid: string;
-    callSid: string;
-  };
 };
 
 export type SetupVoxrayMessage = {
@@ -88,21 +57,12 @@ export type EndVoxrayMessage = {
   handoffData: string;
 };
 
-type AudioMessage =
-  | StartBaseAudioMessage
-  | MediaBaseAudioMessage
-  | StopBaseAudioMessage
-  | ConnectedBaseAudioMessage
-  | MarkBaseAudioMessage
-  | PromptVoxrayMessage
-  | EndVoxrayMessage
-  | TextVoxrayMessage
-  | InterruptVoxrayMessage;
-
 type VoxRayMessage =
   | SetupVoxrayMessage
   | PromptVoxrayMessage
-  | InterruptVoxrayMessage;
+  | InterruptVoxrayMessage
+  | EndVoxrayMessage
+  | TextVoxrayMessage;
 
 type OnCallback<T> = (message: T) => void;
 
@@ -118,12 +78,6 @@ export default class StreamSocket {
   public streamSid: string;
 
   public from?: string;
-
-  private onStartCallback: OnCallback<StartBaseAudioMessage>[] = [];
-
-  private onConnectedCallback: OnCallback<ConnectedBaseAudioMessage>[] = [];
-
-  private onMediaCallback: OnCallback<MediaBaseAudioMessage>[] = [];
 
   private onStopCallback: OnCallback<StopBaseAudioMessage>[] = [];
 
@@ -151,14 +105,6 @@ export default class StreamSocket {
   }
 
   /**
-   * Adds a callback to the connected event
-   * @param callback
-   */
-  public onConnected = (callback: OnCallback<ConnectedBaseAudioMessage>) => {
-    this.onConnectedCallback.push(callback);
-  };
-
-  /**
    * Adds a callback to the setup event
    * @param callback
    */
@@ -180,22 +126,6 @@ export default class StreamSocket {
    */
   public onInterrupt = (callback: OnCallback<InterruptVoxrayMessage>) => {
     this.onInterruptCallback.push(callback);
-  };
-
-  /**
-   * Adds a callback to the start event
-   * @param callback
-   */
-  public onStart = (callback: OnCallback<StartBaseAudioMessage>) => {
-    this.onStartCallback.push(callback);
-  };
-
-  /**
-   * Adds a callback to the media event
-   * @param callback
-   */
-  public onMedia = (callback: OnCallback<MediaBaseAudioMessage>) => {
-    this.onMediaCallback.push(callback);
   };
 
   /**
