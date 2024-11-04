@@ -4,6 +4,7 @@ import Twilio from 'twilio';
 
 import TranslationService from '@/services/TranslationService';
 import StreamSocket, { SetupVoxrayMessage } from '@/services/StreamSocket';
+import { voices } from '@/voices';
 
 const interceptWS: FastifyPluginAsyncTypebox = async (server) => {
   server.get(
@@ -11,12 +12,12 @@ const interceptWS: FastifyPluginAsyncTypebox = async (server) => {
     {
       websocket: true,
     },
-    async (
+    async function (
       socket,
       req: {
-        query: { direction: string; from: string };
+        query: { direction: string; from: string; lang: string };
       },
-    ) => {
+    ) {
       const twilio = Twilio(
         server.config.TWILIO_ACCOUNT_SID,
         server.config.TWILIO_AUTH_TOKEN,
@@ -24,7 +25,7 @@ const interceptWS: FastifyPluginAsyncTypebox = async (server) => {
 
       const logger = req.diScope.resolve<FastifyBaseLogger>('logger');
 
-      const { direction, from } = req.query;
+      const { direction, from, lang } = req.query;
 
       const ss = new StreamSocket({
         logger,
@@ -47,7 +48,7 @@ const interceptWS: FastifyPluginAsyncTypebox = async (server) => {
           const translationService = new TranslationService({
             logger,
             config: server.config,
-            callerLanguage: req.query.lang,
+            callerLanguage: lang,
           });
 
           map.set(message.from, translationService);
@@ -59,12 +60,14 @@ const interceptWS: FastifyPluginAsyncTypebox = async (server) => {
 
           const mediaMessage = {
             type: 'transcriptionLanguage',
-            lang: 'es-US',
+            lang: `'${lang}'`,
           };
 
           logger.info('switching language %s', JSON.stringify(mediaMessage));
 
           ss.send(JSON.stringify(mediaMessage));
+
+          const voice = voices[lang] || 'en-US-Journey-O';
 
           logger.info('Connecting to Agent');
           await twilio.calls.create({
@@ -75,7 +78,7 @@ const interceptWS: FastifyPluginAsyncTypebox = async (server) => {
               <Response>
                 <Connect action="https://innocent-wahoo-extremely.ngrok-free.app/redirect">
                   <ConversationRelay url="wss://innocent-wahoo-extremely.ngrok-free.app/intercept?direction=outbound&amp;from=${message.from}" welcomeGreeting="Hello">
-                    <Lang code="en-US" voice="en-US-Wavenet-B"/>
+                    <Lang code="en-US" voice="${voice}"/>
                   </ConversationRelay>
                 </Connect>
               </Response>
