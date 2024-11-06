@@ -6,7 +6,7 @@ voice language translation between a caller and a contact center agent.
 The AI Assistant gets the conversation transcript from ConversationRelay (STT), translates the text to other party's preferred language, and sends it to the ConversationRelay to be spoken out (TTS).
 
 Below is a high level architecture diagram of how this application works:
-![Realtime Translation Diagram](/realtime-voice-translation-app.jpeg)
+![Architectural Diagram](/conversation-relay-realtime-translation.jpeg)
 
 This application uses the following Twilio products in conjuction with OpenAI's API, orchestrated by this middleware application:
 
