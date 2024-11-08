@@ -6,7 +6,7 @@ voice language translation between a caller and a contact center agent.
 The AI Assistant gets the conversation transcript from ConversationRelay (STT), translates the text to other party's preferred language, and sends it to the ConversationRelay to be spoken out (TTS).
 
 Below is a high level architecture diagram of how this application works:
-![Architectural Diagram](/conversation-relay-realtime-translation.jpeg)
+![Architectural Diagram](docs/conversation-relay-realtime-translation.jpeg)
 
 This application uses the following Twilio products in conjuction with OpenAI's API, orchestrated by this middleware application:
 
@@ -101,24 +101,23 @@ You can update the Studio Flow logic to change the languages you'd like to suppo
 Once your Studio Flow is imported and published, the next step is to point your inbound / caller-facing phone number (`TWILIO_CALLER_NUMBER`) to your Studio Flow. In the Twilio Console, go to **Phone Numbers** > **Manage** > **Active Numbers** and click on the additional phone number you purchased (**not** the one auto-provisioned by Flex).
 
 In your Phone Number configuration settings, update the first **A call comes in** dropdown to **Studio Flow**, select the name of the Flow you created above, and click **Save configuration**.
-![Point Caller Phone Number to Studio Flow](https://github.com/user-attachments/assets/03faf925-ce72-43d9-ad36-2b25d769aac6)
+![Point Caller Phone Number to Studio Flow](docs/inbound-voice-number-webhook.png)
 
 #### Point Agent Phone Number and TaskRouter Workspace to Middleware
 
 The last step is to point the agent-facing phone number (`TWILIO_FLEX_NUMBER`) and the TaskRouter "Flex Task Assignment" Workspace to this middleware app. This is needed to connect the conversation to a contact center agent in Flex.
 
 In the Twilio Console, go to **Phone Numbers** > **Manage** > **Active Numbers** and click on Flex phone number that was auto-provisioned. In your Phone Number configuration settings, update the first **A call comes in** dropdown to **Webhook** and set the URL to `https://[your-ngrok-domain].ngrok.app/outbound-call`, ensure **HTTP** is set to **HTTP POST**, and click **Save configuration**.
-![Point Agent Phone Number to Middleware](https://github.com/user-attachments/assets/dd14dc9e-635a-43fd-b2f9-7f8cd902ba61)
 
 Ensure that you replace `[your-ngrok-domain]` with your assigned ngrok tunnel domain.
 
 Then, go to **TaskRouter** > **Workspaces** > **Flex Task Assignment** > **Settings**, and set the **Event callback URL** to `https://[your-ngrok-domain].ngrok.app/reservation-accepted`, again replacing `[your-ngrok-domain]` with your assigned ngrok tunnel domain.
 
-![Point TaskRouter Workspace to Middleware](https://github.com/user-attachments/assets/4fbeee03-6fb7-47a8-bc39-4b8abb9932cc)
+![Point TaskRouter Workspace to Middleware](docs/task-router-event-callback-url.png)
 
 Finally, under **Select events**, check the checkbox for **Reservation Accepted**.
 
-![Select events > Reservation Accepted](https://github.com/user-attachments/assets/7745ca50-722c-453d-a175-af74bdb7f371)
+![Select events > Reservation Accepted](docs/task-router-reservation-accepted.png)
 
 ### Run the app
 

@@ -59,8 +59,8 @@ const interceptWS: FastifyPluginAsyncTypebox = async (server) => {
           translationService.callerSocket = ss;
 
           const mediaMessage = {
-            type: 'transcriptionLanguage',
-            lang: `'${lang}'`,
+            type: 'language',
+            transcriptionLanguage: `${lang}`,
           };
 
           logger.info('switching language %s', JSON.stringify(mediaMessage));
@@ -77,8 +77,8 @@ const interceptWS: FastifyPluginAsyncTypebox = async (server) => {
             twiml: `
               <Response>
                 <Connect action="https://innocent-wahoo-extremely.ngrok-free.app/redirect">
-                  <ConversationRelay url="wss://innocent-wahoo-extremely.ngrok-free.app/intercept?direction=outbound&amp;from=${message.from}" welcomeGreeting="Hello">
-                    <Lang code="en-US" voice="${voice}"/>
+                  <ConversationRelay url="wss://innocent-wahoo-extremely.ngrok-free.app/intercept?direction=outbound&amp;from=${message.from}">
+                   <Language code="${lang}" ttsProvider="google" voice="${voice}" transcriptionProvider="google" speechModel="telephony"/>
                   </ConversationRelay>
                 </Connect>
               </Response>

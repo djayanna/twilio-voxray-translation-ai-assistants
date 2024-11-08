@@ -28,8 +28,8 @@ const incomingCall: FastifyPluginAsync = async (server) => {
         reply.send(
           `<Response>
             <Connect>
-              <ConversationRelay url="wss://${server.config.NGROK_DOMAIN}/intercept?direction=inbound&amp;from=${from}&amp;lang=${lang}" welcomeGreeting="Hello">
-                <Lang code="${lang}" voice="${voice}"/>
+              <ConversationRelay url="wss://${server.config.NGROK_DOMAIN}/intercept?direction=inbound&amp;from=${from}&amp;lang=${lang}" >       
+                <Language code="${lang}" ttsProvider="google" voice="${voice}" transcriptionProvider="google" speechModel="telephony"/>
               </ConversationRelay>
             </Connect>
           </Response>`,
