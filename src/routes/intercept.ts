@@ -76,8 +76,8 @@ const interceptWS: FastifyPluginAsyncTypebox = async (server) => {
             callerId: message.from,
             twiml: `
               <Response>
-                <Connect action="https://innocent-wahoo-extremely.ngrok-free.app/redirect">
-                  <ConversationRelay url="wss://innocent-wahoo-extremely.ngrok-free.app/intercept?direction=outbound&amp;from=${message.from}">
+                <Connect>
+                  <ConversationRelay url="wss://${server.config.NGROK_DOMAIN}/intercept?direction=outbound&amp;from=${message.from}">
                    <Language code="${lang}" ttsProvider="google" voice="${voice}" transcriptionProvider="google" speechModel="telephony"/>
                   </ConversationRelay>
                 </Connect>
@@ -104,23 +104,6 @@ const interceptWS: FastifyPluginAsyncTypebox = async (server) => {
           logger.info('Setting Agent Socket');
           translationService.agentSocket = ss;
         }
-      });
-
-      ss.onStop((message) => {
-        if (!message?.from) {
-          logger.info('No from in message - unknown what interceptor to close');
-          return;
-        }
-
-        const interceptor = map.get(message.from);
-        if (!interceptor) {
-          logger.error('No interceptor found for %s', message.from);
-          return;
-        }
-
-        logger.info('Closing interceptor');
-        interceptor.close();
-        map.delete(message.from);
       });
     },
   );

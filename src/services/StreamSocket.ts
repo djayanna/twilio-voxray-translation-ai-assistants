@@ -1,24 +1,6 @@
 import { FastifyBaseLogger } from 'fastify';
 import { WebSocket } from '@fastify/websocket';
 
-type BaseAudioMessage = {
-  sequenceNumber: number;
-};
-
-export type ConnectedBaseAudioMessage = BaseAudioMessage & {
-  event: 'connected';
-  protocol: string;
-};
-
-export type StopBaseAudioMessage = BaseAudioMessage & {
-  event: 'stop';
-  stop: {
-    accountSid: string;
-    callSid: string;
-  };
-  from?: string;
-};
-
 export type SetupVoxrayMessage = {
   type: 'setup';
   sessionId: string;
@@ -79,13 +61,13 @@ export default class StreamSocket {
 
   public from?: string;
 
-  private onStopCallback: OnCallback<StopBaseAudioMessage>[] = [];
-
   private onSetupCallback: OnCallback<SetupVoxrayMessage>[] = [];
 
   private onPromptCallback: OnCallback<PromptVoxrayMessage>[] = [];
 
   private onInterruptCallback: OnCallback<InterruptVoxrayMessage>[] = [];
+
+  private onConnectionCloseCallback: OnCallback<any>[] = [];
 
   constructor(options: StreamSocketOptions) {
     this.logger = options.logger;
@@ -94,6 +76,7 @@ export default class StreamSocket {
     this.socket.on('message', this.onMessage);
     this.socket.on('close', () => {
       this.logger.info('WebSocket connection closed');
+      this.onConnectionCloseCallback.map((cb) => cb(null));
     });
     this.socket.on('error', (err) => {
       this.logger.error(`WebSocket error: ${err}`);
@@ -129,11 +112,11 @@ export default class StreamSocket {
   };
 
   /**
-   * Adds a callback to the stop event
+   * Adds a callback to connection close event
    * @param callback
    */
-  public onStop = (callback: OnCallback<StopBaseAudioMessage>) => {
-    this.onStopCallback.push(callback);
+  public onConnectionClose = (callback: OnCallback<any>) => {
+    this.onConnectionCloseCallback.push(callback);
   };
 
   /**

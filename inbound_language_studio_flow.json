@@ -46,9 +46,10 @@
       ],
       "properties": {
         "voice": "default",
+        "number_of_digits": 1,
         "speech_timeout": "auto",
         "offset": {
-          "x": 360,
+          "x": 170,
           "y": 160
         },
         "loop": 1,
@@ -161,7 +162,7 @@
         "variables": [
           {
             "type": "string",
-            "value": "hindi",
+            "value": "hi-IN",
             "key": "caller_language"
           }
         ],
@@ -184,7 +185,7 @@
         "variables": [
           {
             "type": "string",
-            "value": "english",
+            "value": "en-US",
             "key": "caller_language"
           }
         ],
@@ -207,7 +208,7 @@
         "variables": [
           {
             "type": "string",
-            "value": "spanish",
+            "value": "es-US",
             "key": "caller_language"
           }
         ],
@@ -233,8 +234,8 @@
       ],
       "properties": {
         "offset": {
-          "x": 190,
-          "y": 1190
+          "x": 270,
+          "y": 1310
         },
         "method": "POST",
         "url": "https://[your-ngrok-domain].ngrok.app/incoming-call?lang={{flow.variables.caller_language}}",
@@ -254,13 +255,13 @@
         "variables": [
           {
             "type": "string",
-            "value": "mandarin",
+            "value": "cmn-CN",
             "key": "caller_language"
           }
         ],
         "offset": {
           "x": 890,
-          "y": 730
+          "y": 720
         }
       }
     },
@@ -277,7 +278,7 @@
         "variables": [
           {
             "type": "string",
-            "value": "french",
+            "value": "fr-FR",
             "key": "caller_language"
           }
         ],

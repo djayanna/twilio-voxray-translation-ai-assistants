@@ -1,9 +1,7 @@
 import { FastifyBaseLogger } from 'fastify';
-import WebSocket from 'ws';
 import OpenAI from 'openai';
 import z from 'zod';
 import { zodResponseFormat } from 'openai/helpers/zod';
-import { Prompt } from 'twilio/lib/twiml/VoiceResponse';
 
 import StreamSocket, { PromptVoxrayMessage } from '@/services/StreamSocket';
 import { Config } from '@/config';
@@ -146,8 +144,6 @@ export default class TranslationService {
       }
     }
 
-    this.logger.info('Sending translated message to %s', llmResponse);
-
     const mediaMessage = {
       type: 'text',
       token: JSON.parse(llmResponse).translationText,
@@ -165,6 +161,20 @@ export default class TranslationService {
     llmResponse = '';
   }
 
+  private async sendEndMessageToCoversationRelay(ss: StreamSocket) {
+    if (!ss) {
+      this.logger.error('StreamSocket not set');
+      return;
+    }
+
+    const message = {
+      type: 'end',
+    };
+
+    this.logger.info('Sending end message to %s', JSON.stringify(message));
+    ss.send(JSON.stringify(message));
+  }
+
   get callerSocket(): StreamSocket {
     if (!this.#callerSocket) {
       throw new Error('Caller socket not set');
@@ -174,6 +184,10 @@ export default class TranslationService {
 
   set callerSocket(value: StreamSocket) {
     this.#callerSocket = value;
+    this.#callerSocket.onConnectionClose(() => {
+      this.logger.info('Caller connection closed');
+      this.sendEndMessageToCoversationRelay(this.#agentSocket);
+    });
   }
 
   get agentSocket(): StreamSocket {
@@ -185,5 +199,9 @@ export default class TranslationService {
 
   set agentSocket(value: StreamSocket) {
     this.#agentSocket = value;
+    this.#agentSocket.onConnectionClose(() => {
+      this.logger.info('Agent connection closed');
+      this.sendEndMessageToCoversationRelay(this.#callerSocket);
+    });
   }
 }
